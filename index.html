@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FocusFlow — Không Gian Làm Việc & Tập Trung</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- Canvas Confetti -->
+  <canvas id="confetti-canvas"></canvas>
+
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="brand">
+        <div class="logo-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+          </svg>
+        </div>
+        <div>
+          <h1 class="logo-text">FocusFlow</h1>
+          <p class="tagline">Trợ lý tập trung & Năng suất</p>
+        </div>
+      </div>
+
+      <div class="header-center">
+        <div class="live-clock" id="live-clock">00:00:00</div>
+        <div class="live-date" id="live-date">Thứ Hai, 17/11/2026</div>
+      </div>
+
+      <div class="header-actions">
+        <button id="theme-toggle" class="icon-btn" title="Chuyển chế độ sáng/tối" aria-label="Đổi giao diện">
+          <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+          <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+        </button>
+        <button id="fullscreen-btn" class="icon-btn" title="Toàn màn hình" aria-label="Toàn màn hình">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Content Grid -->
+    <main class="dashboard-grid">
+      <!-- Section 1: Pomodoro Timer -->
+      <section class="card timer-card">
+        <div class="card-header">
+          <span class="badge">Phương pháp Pomodoro</span>
+          <div class="session-counter" id="session-counter">Phiên: #1</div>
+        </div>
+
+        <!-- Mode selector tabs -->
+        <div class="timer-modes">
+          <button class="mode-btn active" data-mode="pomodoro">🎯 Tập trung (25m)</button>
+          <button class="mode-btn" data-mode="shortBreak">☕ Nghỉ ngắn (5m)</button>
+          <button class="mode-btn" data-mode="longBreak">🌴 Nghỉ dài (15m)</button>
+        </div>
+
+        <!-- SVG Ring Progress -->
+        <div class="timer-display-container">
+          <svg class="progress-ring" viewBox="0 0 320 320">
+            <circle class="progress-ring-bg" cx="160" cy="160" r="140"></circle>
+            <circle class="progress-ring-fill" id="timer-progress" cx="160" cy="160" r="140"></circle>
+          </svg>
+          <div class="timer-inner">
+            <div class="current-task-chip" id="current-task-display">Chưa chọn việc cần làm</div>
+            <div class="time-readout" id="timer-display">25:00</div>
+            <div class="timer-state" id="timer-state-text">Sẵn sàng</div>
+          </div>
+        </div>
+
+        <!-- Timer Controls -->
+        <div class="timer-controls">
+          <button id="btn-reset" class="btn-action secondary" title="Đặt lại">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="1 4 1 10 7 10"></polyline>
+              <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+            </svg>
+          </button>
+          <button id="btn-start" class="btn-action primary">
+            <svg class="play-icon" viewBox="0 0 24 24" fill="currentColor">
+              <polygon points="5 3 19 12 5 21 5 3"></polygon>
+            </svg>
+            <svg class="pause-icon" viewBox="0 0 24 24" fill="currentColor">
+              <rect x="6" y="4" width="4" height="16"></rect>
+              <rect x="14" y="4" width="4" height="16"></rect>
+            </svg>
+            <span id="btn-start-label">Bắt đầu</span>
+          </button>
+          <button id="btn-skip" class="btn-action secondary" title="Bỏ qua phiên">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="5 4 15 12 5 20 5 4"></polygon>
+              <line x1="19" y1="5" x2="19" y2="19"></line>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Quick settings -->
+        <div class="quick-timer-custom">
+          <span>Tùy chỉnh phút:</span>
+          <input type="number" id="custom-minutes" min="1" max="120" value="25" />
+          <button id="apply-custom-time" class="btn-text">Áp dụng</button>
+        </div>
+      </section>
+
+      <!-- Section 2: To-Do / Kanban Task Board -->
+      <section class="card tasks-card">
+        <div class="card-header">
+          <div class="card-title-group">
+            <h2>Nhiệm Vụ Hôm Nay</h2>
+            <span class="count-badge" id="task-completion-stat">0/0</span>
+          </div>
+          <button id="clear-completed-btn" class="btn-text danger" title="Xóa các mục đã xong">Xóa đã xong</button>
+        </div>
+
+        <!-- Progress bar -->
+        <div class="task-progress-bar-wrapper">
+          <div class="task-progress-bar" id="task-progress-fill" style="width: 0%"></div>
+        </div>
+
+        <!-- Add Task Form -->
+        <form id="add-task-form" class="task-input-form">
+          <div class="input-row">
+            <input 
+              type="text" 
+              id="task-title-input" 
+              placeholder="Thêm nhiệm vụ mới cần làm..." 
+              autocomplete="off" 
+              required
+            >
+            <button type="submit" class="btn-action primary small">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+              <span>Thêm</span>
+            </button>
+          </div>
+          <div class="task-options-row">
+            <div class="priority-selector">
+              <label><input type="radio" name="priority" value="low"> <span class="tag tag-low">Thấp</span></label>
+              <label><input type="radio" name="priority" value="medium" checked> <span class="tag tag-med">Trung</span></label>
+              <label><input type="radio" name="priority" value="high"> <span class="tag tag-high">Gấp 🔥</span></label>
+            </div>
+            <div class="category-selector">
+              <select id="task-category">
+                <option value="Công việc">💼 Công việc</option>
+                <option value="Học tập">📚 Học tập</option>
+                <option value="Cá nhân">🌱 Cá nhân</option>
+              </select>
+            </div>
+          </div>
+        </form>
+
+        <!-- Filters -->
+        <div class="task-filters">
+          <button class="filter-btn active" data-filter="all">Tất cả</button>
+          <button class="filter-btn" data-filter="active">Đang làm</button>
+          <button class="filter-btn" data-filter="completed">Đã xong</button>
+        </div>
+
+        <!-- Task List -->
+        <div class="tasks-list-container" id="tasks-list">
+          <!-- Dynamically populated -->
+        </div>
+      </section>
+
+      <!-- Section 3: Ambient Audio & Productivity Widgets -->
+      <section class="card sidebar-card">
+        <!-- Ambient Sound Generator -->
+        <div class="ambient-widget">
+          <div class="card-header small">
+            <h3>Âm Thanh Tập Trung (Web Audio)</h3>
+            <button id="ambient-master-toggle" class="btn-text">Bật tất cả</button>
+          </div>
+          <p class="widget-desc">Âm thanh thiên nhiên được tạo trực tiếp bằng thuật toán âm thanh của trình duyệt.</p>
+
+          <div class="sound-tracks">
+            <!-- Rain -->
+            <div class="sound-item" data-sound="rain">
+              <div class="sound-info">
+                <span class="sound-icon">🌧️</span>
+                <span class="sound-name">Tiếng Mưa Rào</span>
+              </div>
+              <input type="range" class="sound-slider" min="0" max="100" value="0">
+            </div>
+
+            <!-- Brown Noise -->
+            <div class="sound-item" data-sound="brown">
+              <div class="sound-info">
+                <span class="sound-icon">🌊</span>
+                <span class="sound-name">Sóng Nâu Sâu Lắng</span>
+              </div>
+              <input type="range" class="sound-slider" min="0" max="100" value="0">
+            </div>
+
+            <!-- Campfire -->
+            <div class="sound-item" data-sound="campfire">
+              <div class="sound-info">
+                <span class="sound-icon">🪵</span>
+                <span class="sound-name">Lửa Trại Lách Tách</span>
+              </div>
+              <input type="range" class="sound-slider" min="0" max="100" value="0">
+            </div>
+
+            <!-- Binaural Beat -->
+            <div class="sound-item" data-sound="binaural">
+              <div class="sound-info">
+                <span class="sound-icon">🧠</span>
+                <span class="sound-name">Sóng Não Beta (14Hz)</span>
+              </div>
+              <input type="range" class="sound-slider" min="0" max="100" value="0">
+            </div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Quick Scratchpad / Notes -->
+        <div class="scratchpad-widget">
+          <div class="card-header small">
+            <h3>Ghi Chú Nhanh</h3>
+            <span class="save-status" id="notes-status">Đã lưu tự động</span>
+          </div>
+          <textarea id="scratchpad-textarea" placeholder="Viết nháp nhanh ý tưởng, ghi chú hoặc việc phát sinh tại đây..."></textarea>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Daily Motivation Quote -->
+        <div class="quote-widget">
+          <blockquote id="quote-text">"Kỷ luật là cầu nối giữa mục tiêu và thành tựu."</blockquote>
+          <div class="quote-author" id="quote-author">— Jim Rohn</div>
+          <button id="new-quote-btn" class="btn-text">Đổi câu khác ↻</button>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <div class="stats-summary">
+        <span>⏱️ Đã tập trung hôm nay: <strong id="total-focus-time">0 phút</strong></span>
+        <span>🔥 Chuỗi hoàn thành: <strong id="completed-sessions-count">0 phiên</strong></span>
+      </div>
+      <div>FocusFlow © 2026 — Web tĩnh tương tác cao 100% Client-side</div>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
